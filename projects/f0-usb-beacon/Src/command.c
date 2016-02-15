@@ -122,7 +122,7 @@ void cmd_run(void);
 void cmd_stop(void);
 void cmd_cat(void);
 void cmd_id(char *argstr_buf);
-void cmd_store(char *argstr_buf, uint8_t del);
+void cmd_store(char *argstr_buf, uint8_t del, uint8_t echo);
 void cmd_load(char *argstr_buf);
 void cmd_del(char *argstr_buf);
 void cmd_start(char *argstr_buf);
@@ -257,7 +257,7 @@ function invoked here.
 		break;		
 				
 		case CMD_STORE:
-			cmd_store(argstr_buf,0);
+			cmd_store(argstr_buf,0, 1);
 		break;
 				
 		case CMD_LOAD:
@@ -265,7 +265,7 @@ function invoked here.
 		break;
 				
 		case CMD_DEL:
-			cmd_store(argstr_buf,1);
+			cmd_store(argstr_buf,1, 1);
 		break;
 
 		case CMD_START:
@@ -553,7 +553,7 @@ void cmd_id(char *argstr_buf)
    * @param del - 0 = normal write, 1 - delete 
    * @retval None
    */
-void cmd_store(char *argstr_buf, uint8_t del)
+void cmd_store(char *argstr_buf, uint8_t del, uint8_t echo)
 {
 	char izp[32];
 	int x,i;
@@ -595,9 +595,11 @@ void cmd_store(char *argstr_buf, uint8_t del)
 				}
 
 		  }
-			snprintf(izp, 32, "Backup... status %d\n\r", FLstatus); 
-		  USB_write((uint8_t *)izp, strlen(izp));
-
+			if (echo)
+			{
+			  snprintf(izp, 32, "Backup... status %d\n\r", FLstatus); 
+		    USB_write((uint8_t *)izp, strlen(izp));
+			}
 			// erase store 
 			eraseinit.NbPages = 1;
 			eraseinit.PageAddress = FLASH_STORE_ADR;
@@ -642,8 +644,11 @@ void cmd_store(char *argstr_buf, uint8_t del)
 					
 				}
 			}  /*  for ... */
-			snprintf(izp, 32, "Writing... status %d\n\r", FLstatus); 
-		  USB_write((uint8_t *)izp, strlen(izp));
+			if (echo)
+			{
+				snprintf(izp, 32, "Writing... status %d\n\r", FLstatus); 
+				USB_write((uint8_t *)izp, strlen(izp));
+			}
 
 
 			FLstatus = HAL_FLASH_Lock();  
@@ -810,7 +815,7 @@ void cmd_start(char *argstr_buf)
 				snprintf(izp, 32, "%d", n+1); 
 				cmd_load(izp);
 				settings.autorun = (n==x) ? 1 : 0;
-				cmd_store(izp, 0);		// normal write
+				cmd_store(izp, 0, 0);		// normal write
 			} // for
 			memcpy(&settings, &tmpsettings, sizeof(settings_t));  // temp. storage
     }
