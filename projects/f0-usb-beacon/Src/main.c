@@ -14,12 +14,16 @@
 #include "CDC_receiver.h"
 #include <string.h>
 #include "command.h"
+#include "settings.h"
+#include "morse.h"
+
+settings_t settings;
 
 /* Private variables ---------------------------------------------------------*/
 uint8_t    cdc_activity, refresh_lcd =0 ;
 extern USBD_HandleTypeDef hUsbDeviceFS;
 TIM_HandleTypeDef htim3;
-
+TIM_HandleTypeDef htim14;
 
 extern char *newline;
 
@@ -28,13 +32,21 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM3_Init(void);
+static void MX_TIM14_Init(void);
 
+volatile uint8_t cw_autorunning = 0;
+volatile int ar_count = 0;
 
+void abort_autorun(void)
+{
+	cw_autorunning = 0;
+	ar_count = 0;
+}
 
 int main(void)
 {
 	
-//	int i;
+	int autorun;
 
   /* MCU Configuration----------------------------------------------------------*/
 
@@ -47,10 +59,13 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_TIM3_Init();
+	MX_TIM14_Init();
   MX_USB_DEVICE_Init();
 	
-	HAL_TIM_Base_Start(&htim3); 
-	HAL_TIM_PWM_Start(&htim3,TIM_CHANNEL_1);
+	Morse_Init();
+	
+	autorun = cmd_isautorun() ;
+
 
   /* Infinite loop */
   while (1)
@@ -60,7 +75,14 @@ int main(void)
 //     Process received line
 			cmd_proc(get_line_buffer());
 		}
-
+		HAL_Delay(10); ar_count++;
+		if ((ar_count > 1000) & (autorun>0))
+		{
+			// Start Autorun
+			cmd_autorun(autorun);
+			cw_autorunning = 1;
+			while(cw_autorunning) HAL_Delay(10);
+		}
   }
 }
 
@@ -137,6 +159,27 @@ void MX_TIM3_Init(void)
 }
 
 
+/* TIM14 init function */
+void MX_TIM14_Init(void)
+{
+
+  htim14.Instance = TIM14;
+  htim14.Init.Prescaler = 48;
+  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim14.Init.Period = 1000;
+  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  HAL_TIM_Base_Init(&htim14);
+
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+	if (htim->Instance==TIM14) //check if the interrupt comes from TIM3
+		{
+			Morse_processor();
+		}
+}
+
 /** Configure pins as 
         * Analog 
         * Input 
@@ -146,9 +189,18 @@ void MX_TIM3_Init(void)
 */
 void MX_GPIO_Init(void)
 {
+	GPIO_InitTypeDef GPIO_InitStruct;
+
   /* GPIO Ports Clock Enable */
   __GPIOF_CLK_ENABLE();
   __GPIOA_CLK_ENABLE();
+	
+  /*Configure GPIO pin : PA0 */
+  GPIO_InitStruct.Pin = MORSE_PIN;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
+  HAL_GPIO_Init(MORSE_PORT, &GPIO_InitStruct);
 
 }
 

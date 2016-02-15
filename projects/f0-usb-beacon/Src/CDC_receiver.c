@@ -1,4 +1,17 @@
 /**
+  ******************************************************************************
+  * @file    CDC_receiver.c
+  * @brief   Comm Device Class based Line editor
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; COPYRIGHT(c) 2016 S54MTB</center></h2>
+  *
+  ******************************************************************************
+  */ 
+
+
+/**
  * Command line edit chars
  */
 #define CNTLQ      0x11
@@ -11,6 +24,7 @@
 static unsigned char line_flag; 			// Flag to indicate new received line
 char line_buf[256];
 int line_idx = 0;
+extern void abort_autorun(void);
 
 /**
  * Process received char, check if LF or CR received
@@ -18,6 +32,7 @@ int line_idx = 0;
  */
 void process_rx_char(char rx_char)
 {
+		abort_autorun();
 
     if (rx_char == CR)  rx_char = LF;   
     if (rx_char == BACKSPACE  ||  rx_char == DEL) 

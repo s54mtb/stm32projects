@@ -4,7 +4,7 @@
  *      *** Do not modify ! ***
  *
  * Project: 'USB_beacon' 
- * Target:  'USB_CDC_test Configuration' 
+ * Target:  'MorseGenerator' 
  */
 
 #ifndef RTE_COMPONENTS_H

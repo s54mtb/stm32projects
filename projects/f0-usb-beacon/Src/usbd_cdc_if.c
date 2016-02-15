@@ -245,6 +245,31 @@ uint8_t CDC_Transmit_FS(uint8_t* Buf, uint16_t Len)
 /**
   * @}
   */ 
+int USB_write(void *buf, size_t count) {
+  static int failed;
+	
+	if(hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED)
+		return 0;
+	if(failed) {
+		if(CDC_Transmit_FS(buf, count) == USBD_OK) {
+			failed = 0;
+			return count;
+		}
+		return 0;
+	}
+	uint32_t timeout = HAL_GetTick() + 500; // 0.5 second timeout
+	while(HAL_GetTick() < timeout) {
+		if(hUsbDeviceFS.dev_state != USBD_STATE_CONFIGURED)
+			return 0;
+		int result = CDC_Transmit_FS(buf, count);
+		if(result == USBD_OK)
+			return count;
+		if(result != USBD_BUSY)
+			return -1;
+	}
+	failed = 1;
+	return 0;
+}
 
 /**
   * @}
