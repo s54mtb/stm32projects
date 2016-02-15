@@ -13,3 +13,6 @@ Commands:
 ... work in progress ...
 
 Check <a href="http://e.pavlin.si/">e.pavlin.si web page</a> for more details and hardware resources.
+
+
+Here is shortcut to working device: make single sided PCB, assemble all components, download and install DfuSe from http://www.st.com/web/en/catalog/tools/FM147/CL1794/SC961/SS1533/PF257916 and update firmware with the DFU file https://github.com/s54mtb/stm32projects/blob/master/projects/f0-usb-beacon/Objects/MorseGenerator.dfu
