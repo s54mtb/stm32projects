@@ -25,10 +25,31 @@ extern settings_t settings;
 //static char CW_message_text[CW_MAX_MSG_LENGTH]; 
 Morse_Status_t MS;
 
+
 /**
    * @brief CW Table 
 	 * 				Sequence start is marked with zero bit
    */
+
+#define CW_special		0x8000 	/// Inidcates special sequence or command in CW generator
+#define CH_special		0x80  	/// Inidcates special sequence or command in CW generator
+enum
+{
+	CW_SPC_AA,
+	CW_SPC_AR,
+	CW_SPC_AS,
+	CW_SPC_BK,
+	CW_SPC_BT,
+	CW_SPC_CL,
+	CW_SPC_CT,
+	CW_SPC_DO,
+	CW_SPC_KN,
+	CW_SPC_SK,
+	CW_SPC_SN,
+	CW_SPC_SOS,
+	CW_SPC_BRK
+};
+
 const morse_t morse_keys[] =
 {
 		{'A', 0xfff9},	/// 	11111111 11111001
@@ -84,24 +105,19 @@ const morse_t morse_keys[] =
 		{34,  0xff92},  ///   11111111 10010010 --- Quotation "
 		{'@', 0xff9a},  ///   11111111 10011010 
 		{'=', 0xffd1},  ///   11111111 11010001
-
-		
-//		{'???', 0xffff},  ///   11111111 11100101  --->   AA, New line	.-.-
-//		{'???', 0xffff},  ///   11111111   --->   AR, End of message	.-.-.
-//		{'???', 0xffff},  ///   11111111   --->   AS, Wait	.-...
-//		{'???', 0xffff},  ///   11111111   --->   BK, Break	-...-.-
-//		{'???', 0xffff},  ///   11111111   --->   BT, New paragraph	-...-
-//		{'???', 0xffff},  ///   11111111   --->   CL, Going off the air ("clear")	-.-..-..
-//		{'???', 0xffff},  ///   11111111   --->   CT, Start copying	-.-.-
-//		{'???', 0xffff},  ///   11111111   --->   DO, Change to wabun code	-..---
-//		{'???', 0xffff},  ///   11111111   --->   KN, Invite a specific station to transmit	-.--.
-//		{'???', 0xffff},  ///   11111111   --->   SK, End of transmission (also VA)	...-.-
-//		{'???', 0xffff},  ///   11111111   --->   SN, Understood (also VE)	...-.
-//		{'???', 0xffff},  ///   11111111   --->   SOS, Distress message	...---...		
-		
-//		{'_', 0xffd2},	/// 	11111111 11010010  ---> Break
-//		{'>', 0x8000},	/// 	10000000 00000000  ---> Key Up
-//		{'<', 0xa000},	/// 	10100000 00000000  ---> Key Down
+		{	CH_special | CW_SPC_AA	, CW_special |	CW_SPC_AA	},  ///      --->   AA, New line	.-.-
+		{	CH_special | CW_SPC_AR	, CW_special |	CW_SPC_AR	},  ///      --->   AR, End of message	.-.-.
+		{	CH_special | CW_SPC_AS	, CW_special |	CW_SPC_AS	},  ///      --->   AS, Wait	.-...
+		{	CH_special | CW_SPC_BK	, CW_special |	CW_SPC_BK	},  ///      --->   BK, Break	-...-.-
+		{	CH_special | CW_SPC_BT	, CW_special |	CW_SPC_BT	},  ///      --->   BT, New paragraph	-...-
+		{	CH_special | CW_SPC_CL	, CW_special |	CW_SPC_CL	},  ///      --->   CL, Going off the air ("clear")	-.-..-..
+		{	CH_special | CW_SPC_CT	, CW_special |	CW_SPC_CT	},  ///      --->   CT, Start copying	-.-.-
+		{	CH_special | CW_SPC_DO	, CW_special |	CW_SPC_DO	},  ///      --->   DO, Change to wabun code	-..---
+		{	CH_special | CW_SPC_KN	, CW_special |	CW_SPC_KN	},  ///      --->   KN, Invite a specific station to transmit	-.--.
+		{	CH_special | CW_SPC_SK	, CW_special |	CW_SPC_SK	},  ///      --->   SK, End of transmission (also VA)	...-.-
+		{	CH_special | CW_SPC_SN	, CW_special |	CW_SPC_SN	},  ///      --->   SN, Understood (also VE)	...-.
+		{	CH_special | CW_SPC_SOS	, CW_special |	CW_SPC_SOS},  ///      --->   SOS, Distress message	...---...
+		{	CH_special | CW_SPC_BRK	, CW_special |	CW_SPC_BRK},  ///      --->   SOS, Distress message	...---...
 };
 
 #define CW_NOKEYFOUND		0xffff

@@ -24,6 +24,13 @@
 #define MORSE_PIN			GPIO_PIN_0
 #define MORSE_PORT		GPIOA
 
+#define AUTORUN_SEL0PIN			GPIO_PIN_1
+#define AUTORUN_SEL1PIN			GPIO_PIN_2
+#define AUTORUN_SEL2PIN			GPIO_PIN_3
+#define AUTORUN_SEL0PORT 		GPIOA
+#define AUTORUN_SEL1PORT 		GPIOA
+#define AUTORUN_SEL2PORT 		GPIOA
+
 typedef struct 
 {
 	char 			ch;

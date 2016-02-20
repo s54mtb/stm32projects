@@ -201,6 +201,16 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_LOW;
   HAL_GPIO_Init(MORSE_PORT, &GPIO_InitStruct);
+	
+  /*Configure GPIO pins : SEL0, SEL1, SEL2 --- autorun select pins */
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLDOWN;
+  GPIO_InitStruct.Pin = AUTORUN_SEL0PIN;
+  HAL_GPIO_Init(AUTORUN_SEL0PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = AUTORUN_SEL1PIN;
+  HAL_GPIO_Init(AUTORUN_SEL1PORT, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = AUTORUN_SEL2PIN;
+  HAL_GPIO_Init(AUTORUN_SEL2PORT, &GPIO_InitStruct);
 
 }
 

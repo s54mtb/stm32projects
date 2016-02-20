@@ -754,13 +754,12 @@ void DisplaySettings(settings_t *set)
 	USB_write((uint8_t *)izp, strlen(izp));
 	snprintf(izp, 32, " Out.cw=%d ", set->out.cw);
 	USB_write((uint8_t *)izp, strlen(izp));
-	
-	if (set->autorun) 
+	if (set->autorun > 0)
 	{
-  	snprintf(izp, 32, " Autorun! "); 
+		if (set->autorun == 1) snprintf(izp, 32, " AR! "); 
+		if (set->autorun == 2) snprintf(izp, 32, " SAR! "); 
 	  USB_write((uint8_t *)izp, strlen(izp));
-	}
-
+  }
 	
 }
 
@@ -793,34 +792,60 @@ void cmd_stop(void)
 
 /**
    * @brief Mark selected entry as startup/autorun
-   * @param None
+   * @param String 1...8 or 101...108
+	 *                1...8 ---> "Normal" autorun, 101...108 --> Selective autorun 
    * @param None
    * @retval None
    */
 void cmd_start(char *argstr_buf)
 {
-	int x, n;
-	char izp[32];
-	settings_t tmpsettings;
-	
+	int x;
+
 	if ((argstr_buf != NULL) & (strlen(argstr_buf)>0))
 	{		
     x = atoi(argstr_buf);
-		if ((x>0) & (x<=SETTINGS_CATLEN))
+		if ((x>=0) & (x<=2))
 		{
-			x--; // x = 1...n 
-			memcpy(&tmpsettings, &settings, sizeof(settings_t));  // temp. storage
-			for (n=0; n<SETTINGS_CATLEN; n++)
-			{
-				snprintf(izp, 32, "%d", n+1); 
-				cmd_load(izp);
-				settings.autorun = (n==x) ? 1 : 0;
-				cmd_store(izp, 0, 0);		// normal write
-			} // for
-			memcpy(&settings, &tmpsettings, sizeof(settings_t));  // temp. storage
+			settings.autorun = x;
+			
+//			x--; // x = 1...n 
+//			memcpy(&tmpsettings, &settings, sizeof(settings_t));  // temp. storage
+//			for (n=0; n<SETTINGS_CATLEN; n++)
+//			{
+//				snprintf(izp, 32, "%d", n+1); 
+//				cmd_load(izp);
+//				if (x<100)
+//				{
+//				  settings.autorun = (n==x) ? 1 : 0;
+//				}
+//				else
+//				{
+//				  settings.autorun = ((n+100)==x) ? 100 : settings.autorun;					
+//				}
+//				cmd_store(izp, 0, 0);		// normal write
+//			} // for
+//			memcpy(&settings, &tmpsettings, sizeof(settings_t));  // temp. storage
     }
   }
 }
+
+
+uint8_t selectpins(void)
+{
+	uint8_t sp =0;
+	GPIO_PinState pins;
+
+	pins = HAL_GPIO_ReadPin(AUTORUN_SEL0PORT, AUTORUN_SEL0PIN);
+	sp |= (pins==GPIO_PIN_SET) ? 0x01 : 0;
+	pins = HAL_GPIO_ReadPin(AUTORUN_SEL1PORT, AUTORUN_SEL1PIN);
+	sp |= (pins==GPIO_PIN_SET) ? 0x02 : 0;
+	pins = HAL_GPIO_ReadPin(AUTORUN_SEL2PORT, AUTORUN_SEL2PIN);
+	sp |= (pins==GPIO_PIN_SET) ? 0x04 : 0;
+	
+	return sp;
+}
+
+
 
 
 int cmd_isautorun(void)
@@ -834,7 +859,19 @@ int cmd_isautorun(void)
 		firstchar = settings_Store[i].Ident[0];
 		if ((strlen(settings_Store[i].Ident) > 0) & (firstchar!=0xff)) // is not empty?
 		{
-			if (settings_Store[i].autorun) autorun = i+1;
+			if (settings_Store[i].autorun == 1) 
+			{
+				autorun = i+1;  // remember first autorun parameter equal to 1 in catalog
+				break;
+			}
+			if (settings_Store[i].autorun == 2) 
+			{
+				if (i == selectpins()) 
+				{
+					autorun = i+1;  // remember first autorun parameter equal to 2 in catalog at location equal to selectpins()
+					break;					
+				}
+			}
 		}
 	}
 	
