@@ -55,6 +55,7 @@ typedef struct
   int MPS_key_idx;
   int MPS_pause;
   uint16_t MPS_CurrentKey;
+	uint8_t  CharSpacing;   // "<" set to 1, ">" set to 3 --- for AA, AR, SK ...
 } Morse_Status_t;
 
 void Morse_Init(void);
