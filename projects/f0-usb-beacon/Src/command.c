@@ -701,7 +701,7 @@ void cmd_cat(void)
 {
 	int i;
 	char izp[32];
-	char firstchar;
+	uint8_t firstchar;
 	
 	for (i=0; i<SETTINGS_CATLEN; i++)
 	{
@@ -851,13 +851,13 @@ uint8_t selectpins(void)
 int cmd_isautorun(void)
 {
 	int i;
-	char firstchar;
+	uint8_t firstchar;
 	int autorun = -1;
 	
 	for (i=0; i<SETTINGS_CATLEN; i++)
 	{
 		firstchar = settings_Store[i].Ident[0];
-		if ((strlen(settings_Store[i].Ident) > 0) & (firstchar!=0xff)) // is not empty?
+		if ((strlen(settings_Store[i].Ident) > 0) & (firstchar!=0xff)) // is not empty? 
 		{
 			if (settings_Store[i].autorun == 1) 
 			{
