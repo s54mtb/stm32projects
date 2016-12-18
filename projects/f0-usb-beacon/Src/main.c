@@ -36,7 +36,7 @@ static void MX_GPIO_Init(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM3_Init(void);
 static void MX_TIM14_Init(void);
-static void MX_SPI1_Init(void);
+//static void MX_SPI1_Init(void);
 
 volatile uint8_t cw_autorunning = 0;
 volatile int ar_count = 0;
@@ -143,7 +143,7 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-	MX_SPI1_Init();
+	//MX_SPI1_Init();
 	HAL_GPIO_WritePin(GPIOB, GPIO_PIN_1, GPIO_PIN_SET);
 
   MX_TIM3_Init();
@@ -188,6 +188,16 @@ void SystemClock_Config(void)
   RCC_ClkInitTypeDef RCC_ClkInitStruct;
   RCC_PeriphCLKInitTypeDef PeriphClkInit;
 
+#ifdef USE_XTAL_8MHZ
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+  RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
+  RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
+  RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
+  HAL_RCC_OscConfig(&RCC_OscInitStruct);	
+#else
   RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
   RCC_OscInitStruct.HSIState = RCC_HSI_ON;
   RCC_OscInitStruct.HSICalibrationValue = 16;
@@ -196,7 +206,8 @@ void SystemClock_Config(void)
   RCC_OscInitStruct.PLL.PLLMUL = RCC_PLL_MUL6;
   RCC_OscInitStruct.PLL.PREDIV = RCC_PREDIV_DIV1;
   HAL_RCC_OscConfig(&RCC_OscInitStruct);
-
+#endif
+ 
   RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_SYSCLK;
   RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
   RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
@@ -317,27 +328,27 @@ void MX_GPIO_Init(void)
 
 
 
-/* SPI1 init function */
-void MX_SPI1_Init(void)
-{
+///* SPI1 init function */
+//void MX_SPI1_Init(void)
+//{
 
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_SOFT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLED;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
-  hspi1.Init.CRCPolynomial = 7;
-  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
-  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLED;
-  HAL_SPI_Init(&hspi1);
-	
-}
+//  hspi1.Instance = SPI1;
+//  hspi1.Init.Mode = SPI_MODE_MASTER;
+//  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
+//  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
+//  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
+//  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
+//  hspi1.Init.NSS = SPI_NSS_SOFT;
+//  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_32;
+//  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
+//  hspi1.Init.TIMode = SPI_TIMODE_DISABLED;
+//  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLED;
+//  hspi1.Init.CRCPolynomial = 7;
+//  hspi1.Init.CRCLength = SPI_CRC_LENGTH_DATASIZE;
+//  hspi1.Init.NSSPMode = SPI_NSS_PULSE_ENABLED;
+//  HAL_SPI_Init(&hspi1);
+//	
+//}
 
 #ifdef USE_FULL_ASSERT
 
