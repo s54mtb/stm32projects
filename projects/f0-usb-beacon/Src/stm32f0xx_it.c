@@ -10,6 +10,7 @@
 #include "stm32f0xx_hal.h"
 #include "stm32f0xx.h"
 #include "stm32f0xx_it.h"
+#include "command.h"
 
 /* External variables --------------------------------------------------------*/
 extern PCD_HandleTypeDef hpcd_USB_FS;
@@ -44,6 +45,7 @@ void USB_IRQHandler(void)
   HAL_PCD_IRQHandler(&hpcd_USB_FS);
 }
 
+static GPIO_PinState testpin = GPIO_PIN_RESET;
 
 /**
 * @brief This function handles TIM14 global interrupt.
@@ -52,6 +54,11 @@ void TIM14_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM14_IRQn 0 */
 
+	if (GetFtestState() == 1)
+	{
+	  HAL_GPIO_WritePin(GPIOA,GPIO_PIN_4, testpin);
+	  if (testpin == GPIO_PIN_RESET) testpin = GPIO_PIN_SET; else testpin = GPIO_PIN_RESET;
+	}
   /* USER CODE END TIM14_IRQn 0 */
   HAL_TIM_IRQHandler(&htim14);
   /* USER CODE BEGIN TIM14_IRQn 1 */

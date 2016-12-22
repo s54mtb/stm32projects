@@ -52,7 +52,7 @@ Morse_Status_t MS;
 
 const morse_t morse_keys[] =
 {
-		{'A', 0xfff9},	/// 	11111111 11111001
+		{'A', 0xfff9},	/// 	11111111 111110011
 		{'B', 0xffe8},	/// 	11111111 11101000
 		{'C', 0xffea},	/// 	11111111 11101010
 		{'D', 0xfff4},	/// 	11111111 11110100
@@ -240,7 +240,7 @@ void Morse_processor(void)
 		MS.timebase++;
 		if (MS.timebase > MS.MPS_pause)
 		{
-		  HAL_TIM_Base_Stop_IT(&htim14);
+		  /////////////////////////////////////////////////HAL_TIM_Base_Stop_IT(&htim14);
 			MS.timebase = 0;
 			MS.duration += MS.MPS_pause;  // message duration
 			switch (MS.MorsePorcessroStage)
@@ -349,7 +349,7 @@ void Morse_processor(void)
 		}  /* if (MS.timebase > MS.MPS_pause)  */
 					
   } /*  if (MS.MorsePorcessroStage != MPS_Stop)  */
-		HAL_TIM_Base_Start_IT(&htim14);
+	/////////////////////////////////HAL_TIM_Base_Start_IT(&htim14);
 }
 
 

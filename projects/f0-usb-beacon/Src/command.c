@@ -26,6 +26,8 @@
 
 
 extern settings_t settings;
+static uint8_t ftest = 0;
+
 
 /** Globals */
 static char cmdstr_buf [1 + MAX_CMD_LEN];
@@ -57,6 +59,7 @@ enum
 		CMD_DEL,
 		CMD_ID,
 		CMD_START,
+		CMD_FTEST,
 		// Add more 
 		CMD_LAST
   };
@@ -88,6 +91,7 @@ const char helptext[] =
   " ID ...Text...\n\r"
   " STOP\n\r"
 	" START x\n\r"
+  " FTEST 0|1\n\r"
   "\n\r";
 
 /**
@@ -108,6 +112,7 @@ const struct cmd_st cmd_tbl [] =
 		{ "DEL",  			CMD_DEL,  },
 		{ "ID",   			CMD_ID,  },
 		{ "START",   		CMD_START,  },
+		{ "FTEST",      CMD_FTEST,  },
   };
 	
 #define CMD_TBL_LEN (sizeof (cmd_tbl) / sizeof (cmd_tbl [0]))
@@ -126,6 +131,7 @@ void cmd_store(char *argstr_buf, uint8_t del, uint8_t echo);
 void cmd_load(char *argstr_buf);
 void cmd_del(char *argstr_buf);
 void cmd_start(char *argstr_buf);
+void cmd_ftest(char *argstr_buf);
 
 void cmd_unknown(char *argstr_buf);
 
@@ -270,6 +276,10 @@ function invoked here.
 
 		case CMD_START:
 			cmd_start(argstr_buf);
+		break;
+
+		case CMD_FTEST:
+			cmd_ftest(argstr_buf);
 		break;
 		
 		case CMD_LAST:
@@ -828,6 +838,76 @@ void cmd_start(char *argstr_buf)
     }
   }
 }
+
+
+/**
+   * @brief Return ftest state 
+   */
+uint8_t GetFtestState(void)
+{
+	return ftest;
+}
+
+
+/**
+   * @brief Init or deinit ftest pin 
+   * @param int 0 or 1
+	 *               0 - enable, 1 - disable 
+   * @retval None
+   */
+void ftestpin(int enable)
+{
+	
+	GPIO_InitTypeDef GPIO_InitStruct;
+
+	if (enable>0)
+	{
+		/*Configure GPIO pin : PA4  */
+		GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+		GPIO_InitStruct.Pull = GPIO_NOPULL;
+		GPIO_InitStruct.Speed = GPIO_SPEED_HIGH;
+		GPIO_InitStruct.Pin = GPIO_PIN_4;
+		HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		ftest = 1;
+		
+	}
+	else
+	{
+		HAL_GPIO_DeInit(GPIOA, GPIO_PIN_4);
+		ftest = 0;
+	} 
+	
+}
+
+
+
+/**
+   * @brief Enable time base (frequency) test on PA4 
+   * @param String 0 or 1
+	 *               0 - enable, 1 - disable 
+   * @retval None
+   */
+void cmd_ftest(char *argstr_buf)
+{
+	int x;
+	char izp[32];
+
+	if ((argstr_buf != NULL) & (strlen(argstr_buf)>0))
+	{		
+    x = atoi(argstr_buf);
+		if ((x>=0) & (x<=1))
+		{
+			ftestpin(x);
+    }
+  }
+	else
+	{
+		snprintf(izp, 32, "FTEST: %d\n\r",GetFtestState());
+		USB_write((uint8_t *)izp, strlen(izp));
+	}
+}
+
+
 
 
 uint8_t selectpins(void)

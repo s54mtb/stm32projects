@@ -7,6 +7,8 @@
 void cmd_proc (char *cmd);
 int cmd_isautorun(void);
 void cmd_autorun(int ar);
+uint8_t GetFtestState(void);
+
 
 #endif
 
